@@ -76,8 +76,8 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 
 ## Final — Submission
 
-- [ ] Fill in `ANSWERS.md` (research links, pricing decisions, AI use, expert questions)
-- [ ] 2–3 screenshots
+- [x] Fill in `ANSWERS.md` (research links, pricing decisions, AI use, expert questions)
+- [x] Screenshots (4, shown in `ANSWERS.md`)
 - [ ] Zip as `firstname-lastname.zip` without `node_modules`, `bin`, `obj`; test a fresh unzip
 - [ ] Upload before Saturday, December 12, 11:59 PM ET (earlier is better: rolling hiring)
 

@@ -1,8 +1,24 @@
 # Answers
 
-- **Name:** TODO
-- **Email** (the one you applied with): TODO
-- **Phone** (optional): TODO
+- **Name:** Paramasivam Ramasamy
+- **Email** (the one you applied with): paramasivam3448@gmail.com
+- **Phone** (optional): +91 63797 73448
+
+## What I built
+
+A tool for a countertop shop to **draw a counter and price it as they go**:
+
+- **Draw** a straight, L or U counter by typing sizes the way shops write them (`120`, `25 1/2`, `10' 6"`). Click each edge to mark it *finished*, *against the wall* or *backsplash*, and click outside corners to round them.
+- **Pick the stone**: material and a real stone colour (e.g. Uba Tuba granite, Calacatta-look quartz). The colour sets the price level and is shown on the drawing, the slabs and in 3D.
+- **See the price live**: an itemized quote with the working on every line (`33.73 sq ft × $90.00`), charging edge profiles only on finished edges.
+- **See the stone it needs**: how many slabs, where the seams go, and how much of the stone is used, with the slabs drawn to scale.
+- **See it in 3D**: the counter on cabinets with walls, backsplash, edge profile and seams, updating as you type.
+- **Understand every word**: point at any trade term (bullnose, backsplash, seam, level…) and a box explains it in plain words, with pictures.
+- **Save** the drawing and quote to the job; the jobs list shows each counter's shape in its stone and its total.
+
+![L-shaped kitchen: drawing, options, itemized quote and the plain-words help box](screenshots/1-l-shape-quote.png)
+
+`ROADMAP.md` has the plan and a **decisions log** (what I chose and why), and the git history shows the work step by step.
 
 ## 1. What did you need to research, and how did you do it?
 
@@ -34,13 +50,11 @@ I also estimate **how many slabs** a job needs. The tool cuts the counter at its
 
 ## 3. How did you use AI? Where did it help, and how did you lead it?
 
-TODO: check this section and rewrite it in your own words.
-
 I used Claude Code throughout: for the research, for planning and for writing most of the code.
 
 - **How I led it:** I had it research the domain first and write a roadmap (`ROADMAP.md`) before any code, with required work separated from stand-out features. Then I had it build one step at a time (pricing engine, drawing, quote and saving, slab estimate), reviewing each step in the browser before moving on. Every step was committed separately so the history shows how it was built.
-- **Where it helped:** turning cost-guide ranges into a pricing model, the geometry (outline, area, outside corners), the 3D view, and the testing.
-- **Where I pushed it:** after trying the first version, I found the trade words hard to follow and the drawing too abstract. I asked for a plain-words help box, real stone colours, and a live 3D preview. There are 62 unit tests whose expected answers are worked out by hand in comments, 4 backend tests, and a scripted browser check that saves, reloads and compares with the API.
+- **Where it helped:** turning cost-guide ranges into a pricing model, the geometry (outline, area, outside corners), the 3D view, and the testing. There are 71 unit tests whose expected answers are worked out by hand in comments, 4 backend tests, and scripted browser checks that save, reload and compare with the API.
+- **Where I pushed it:** after trying the first version, I found the trade words hard to follow and the drawing too abstract. I asked for a plain-words help box, real stone colours and a live 3D preview. Then I reviewed the whole app and asked for a better jobs list and new-job page, and for switching shape to keep my depth and ask before losing work.
 - **What I checked or changed:** The decisions log in `ROADMAP.md` records each choice and why. Browser screenshots caught issues the tests didn't, such as size labels reading the wrong way. I kept the slab estimate out of the price on purpose, and kept every guessed price marked as an assumption.
 
 ## 4. What would you ask an industry expert to check or improve this?
@@ -111,6 +125,8 @@ The database migrates itself on start (one new migration adds the drawing and qu
 - Numbers on the drawing match the pieces on the slabs.
 - In 3D, the edge profile changes the shape of the stone's edge, and seams show as thin lines.
 - The 3D library is only downloaded when the 3D view is first opened, so the page stays fast.
+- Switching shape keeps the depth you typed, and asks before losing lengths, edges or corners you set.
+- On the jobs list, click anywhere on a row to open the job.
 
 **Known problems and limits:**
 - Prices are ballpark defaults, not one shop's rates.
@@ -121,7 +137,18 @@ The database migrates itself on start (one new migration adds the drawing and qu
 
 ## Screenshots
 
-- `screenshots/1-l-shape-quote.png`: L-shaped kitchen in Carrara-look quartz with backsplash, radius corner, sink, the itemized quote and the plain-words help box
-- `screenshots/2-u-shape-slabs.png`: U-shape in Santa Cecilia granite needing 2 slabs, with seams and the slab layout
-- `screenshots/3-3d-view.png`: the same U-shape in the 3D view
-- `screenshots/4-jobs-list.png`: jobs list with shapes and quoted totals
+All four are in the `screenshots` folder.
+
+**1. L-shaped kitchen** (`screenshots/1-l-shape-quote.png`): Carrara-look quartz with a backsplash, a radius corner and a sink. The itemized quote is on the right, with the plain-words help box explaining the half bullnose edge. It is shown at the top of this file.
+
+**2. U-shape and its slabs** (`screenshots/2-u-shape-slabs.png`): Santa Cecilia granite needing 2 slabs and 2 seams. Pieces are numbered on the drawing and on the slabs, and the quote warns that more than half the stone is left over.
+
+![U-shape in Santa Cecilia granite with seams and the slab layout](screenshots/2-u-shape-slabs.png)
+
+**3. 3D view** (`screenshots/3-3d-view.png`): the same U-shape on cabinets, with the backsplash, rounded corner and seams.
+
+![The U-shape in the 3D view](screenshots/3-3d-view.png)
+
+**4. Jobs list** (`screenshots/4-jobs-list.png`): each counter's shape in its stone, the stone name, date and quoted total.
+
+![Jobs list with shape thumbnails and totals](screenshots/4-jobs-list.png)
