@@ -100,6 +100,7 @@ export function EdgeLegend() {
       <li><span className="swatch swatch-backsplash" />Backsplash</li>
       <li><span className="swatch swatch-corner" />Square corner</li>
       <li><span className="swatch swatch-corner swatch-radius" />Radius corner</li>
+      <li><span className="swatch swatch-seam" />Seam</li>
     </ul>
   );
 }

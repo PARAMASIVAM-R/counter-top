@@ -8,6 +8,8 @@ export interface Material {
   name: string;
   /** Price per sq ft for each level (group). Index 0 is level 1, the cheapest stones. */
   pricePerSqFtByLevel: number[];
+  /** Typical slab size in inches. Real slabs vary by quarry and brand. */
+  slab: { length: number; width: number };
 }
 
 export interface EdgeProfile {
@@ -33,9 +35,11 @@ export interface PriceList {
 
 export const DEFAULT_PRICE_LIST: PriceList = {
   materials: [
-    { id: 'granite', name: 'Granite', pricePerSqFtByLevel: [55, 75, 95] }, // sources: $50–130 installed
-    { id: 'quartz', name: 'Quartz', pricePerSqFtByLevel: [70, 90, 120] }, // sources: $50–200 installed
-    { id: 'marble', name: 'Marble', pricePerSqFtByLevel: [90, 120, 150] },
+    // Prices: sources give $50–130 (granite) and $50–200 (quartz) per sq ft installed.
+    // Slabs: natural stone is about 9–10' × 5–6'; standard quartz is about 10' × 4'8" (jumbo is larger).
+    { id: 'granite', name: 'Granite', pricePerSqFtByLevel: [55, 75, 95], slab: { length: 114, width: 66 } },
+    { id: 'quartz', name: 'Quartz', pricePerSqFtByLevel: [70, 90, 120], slab: { length: 120, width: 56 } },
+    { id: 'marble', name: 'Marble', pricePerSqFtByLevel: [90, 120, 150], slab: { length: 108, width: 64 } },
   ],
   edgeProfiles: [
     { id: 'eased', name: 'Eased', pricePerLinearFoot: 0 }, // usually included

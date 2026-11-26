@@ -1,6 +1,8 @@
 import { useId } from 'react';
 import type { CutoutId, PriceList } from '../counter/priceList';
 import type { Quote, QuoteOptions } from '../counter/quote';
+import type { SlabPlan } from '../counter/slabs';
+import { seamText } from './SlabLayout';
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const wholeMoney = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -81,7 +83,7 @@ export function OptionsPanel({ options, prices, onChange }: OptionsProps) {
   );
 }
 
-export function QuotePanel({ quote, minimumJob }: { quote: Quote; minimumJob: number }) {
+export function QuotePanel({ quote, minimumJob, plan }: { quote: Quote; minimumJob: number; plan: SlabPlan }) {
   if (quote.errors.length) {
     return <p className="muted">Fix the drawing to see a price.</p>;
   }
@@ -110,6 +112,17 @@ export function QuotePanel({ quote, minimumJob }: { quote: Quote; minimumJob: nu
         <p className="hint">Below the {wholeMoney.format(minimumJob)} minimum job charge, so the minimum applies.</p>
       )}
       <p className="hint">Installed price, before tax. Prices are ballpark defaults.</p>
+      {plan.slabs > 0 && (
+        <div className="quote-slabs">
+          <strong>Stone needed:</strong> {plan.slabs} {plan.slabs === 1 ? 'slab' : 'slabs'}, {seamText(plan.seams.length)}
+          <div className="hint">{plan.yieldPercent}% of the stone bought ends up in the counter.</div>
+          {plan.yieldPercent < 50 && (
+            <div className="hint warning">
+              More than half of the stone is left over. Check the price covers it, or quote by the slab.
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }

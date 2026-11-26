@@ -5,10 +5,12 @@ import { getJob, type Job, updateJob } from '../api';
 import { EdgeLegend, LegInputs, ShapePicker } from '../components/CounterControls';
 import { CounterDrawing } from '../components/CounterDrawing';
 import { OptionsPanel, QuotePanel } from '../components/QuotePanels';
+import { SlabLayout } from '../components/SlabLayout';
 import { type Drawing, materialName, parseDrawing, serializeDrawing } from '../counter/drawing';
 import { DEFAULT_PRICE_LIST } from '../counter/priceList';
 import { quote as priceQuote } from '../counter/quote';
 import { createCounter, validateCounter } from '../counter/shapes';
+import { planSlabs } from '../counter/slabs';
 
 const prices = DEFAULT_PRICE_LIST;
 
@@ -35,6 +37,8 @@ function JobEditor({ job }: { job: Job }) {
   const dirty = json !== (neverSaved ? startJson : savedJson);
   const problems = validateCounter(counter);
   const quote = useMemo(() => priceQuote(counter, options, prices), [counter, options]);
+  const material = prices.materials.find((m) => m.id === options.materialId) ?? prices.materials[0];
+  const plan = useMemo(() => planSlabs(counter, material.slab), [counter, material]);
 
   const save = useMutation({
     mutationFn: () => updateJob({ ...job, material: materialName(options.materialId), drawing: json, quoteTotal: quote.total }),
@@ -85,7 +89,12 @@ function JobEditor({ job }: { job: Job }) {
                 {problems.map((p) => <li key={p}>{p}</li>)}
               </ul>
             )}
-            <CounterDrawing counter={counter} onChange={(c) => setDrawing({ ...drawing, counter: c })} invalid={problems.length > 0} />
+            <CounterDrawing
+              counter={counter}
+              onChange={(c) => setDrawing({ ...drawing, counter: c })}
+              invalid={problems.length > 0}
+              plan={problems.length ? undefined : plan}
+            />
             <EdgeLegend />
           </section>
 
@@ -99,11 +108,20 @@ function JobEditor({ job }: { job: Job }) {
               <OptionsPanel options={options} prices={prices} onChange={(o) => setDrawing({ ...drawing, options: o })} />
             </section>
           </div>
+
+          <section className="card" aria-label="Slab layout">
+            <h2>Slab layout</h2>
+            <SlabLayout plan={plan} material={material.name} />
+            <p className="hint">
+              Estimate from a typical {material.name.toLowerCase()} slab. Corners are cut whichever way needs the fewest
+              slabs, then the fewest seams. Numbers match the pieces on the drawing.
+            </p>
+          </section>
         </div>
 
         <aside className="card quote-card" aria-label="Quote">
           <h2>Quote</h2>
-          <QuotePanel quote={quote} minimumJob={prices.minimumJob} />
+          <QuotePanel quote={quote} minimumJob={prices.minimumJob} plan={plan} />
         </aside>
       </div>
     </>

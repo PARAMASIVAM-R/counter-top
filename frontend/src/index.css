@@ -12,6 +12,7 @@
   --finished: #1f2933;
   --wall: #9aa5b1;
   --backsplash: #c2560c;
+  --seam: #d0312d;
   --danger: #a61b1b;
   --radius: 6px;
 
@@ -123,6 +124,29 @@ th.amount { text-align: right; }
 .swatch-backsplash { border-color: var(--backsplash); border-top-width: 5px; }
 .swatch-corner { width: 10px; height: 10px; border: 1.5px solid var(--accent); border-radius: 50%; }
 .swatch-radius { background: var(--accent); }
+.swatch-seam { border-top: 2px dashed var(--seam); }
+
+/* Seams and pieces on the drawing */
+.drawing .seam { stroke: var(--seam); stroke-width: 2; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; pointer-events: none; }
+.drawing .piece-number { pointer-events: none; }
+.drawing .piece-number circle { fill: var(--surface); stroke: var(--stone-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.drawing .piece-number text { fill: var(--muted); text-anchor: middle; dominant-baseline: central; font-weight: 600; }
+
+/* Slab layout */
+.slab-summary { margin: 0 0 10px; }
+.slabs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.slab { margin: 0; }
+.slab svg { display: block; width: 100%; height: auto; }
+.slab figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.slab-stone { fill: #f7f5f1; stroke: var(--stone-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.slab-trim { fill: none; stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.slab-piece { fill: var(--stone); stroke: var(--ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.slab-label { fill: var(--ink); text-anchor: middle; dominant-baseline: central; font-weight: 600; }
+.piece-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.piece-list li { display: inline-flex; align-items: center; gap: 6px; }
+.piece-badge { display: inline-grid; place-items: center; width: 18px; height: 18px; border: 1px solid var(--stone-edge); border-radius: 50%; font-size: 11px; font-weight: 600; color: var(--muted); }
+.quote-slabs { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
+.quote-slabs .warning { color: #8a5200; }
 
 /* Size inputs */
 .legs { display: grid; gap: 10px; }

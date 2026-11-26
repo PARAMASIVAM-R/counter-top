@@ -45,7 +45,10 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 
 ## Step 4 — Stand-out features
 
-- [ ] Slab estimate: "needs 2 slabs, 1 seam" (stone is bought by the whole slab)
+- [x] Slab estimate: "needs 2 slabs, 1 seam" (stone is bought by the whole slab)
+  - [x] Tries every way of cutting the corners, keeps fewest slabs then fewest seams
+  - [x] Seams and numbered pieces on the drawing; slabs drawn to scale with the pieces on them
+  - [x] Stone yield %, with a warning when more than half the stone is left over
 - [ ] Waste % shown and editable
 - [ ] Editable price list (settings page)
 - [ ] Printable customer quote
@@ -89,3 +92,8 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 | One edge profile for the whole job | How most kitchens are ordered; mixing profiles per edge is a later step |
 | Changing material on the quote updates the job's material | One source of truth; the list and the quote never disagree |
 | Quote panel stays visible while scrolling | The price is what the user is watching while they draw |
+| Slab estimate tries both ways of cutting each corner | For the default L it is the difference between 1 and 2 slabs: 94½" + 96" pieces fit two rows of one slab, 120" + 70½" do not |
+| Pieces laid out in rows along the slab | How counter strips are nested in practice; simple to explain and test |
+| 1" trimmed off each slab edge, ½" saw kerf between pieces | Slab edges are rough; the blade removes material. Both are constants to confirm with a fabricator |
+| Slab estimate does not change the price | Shops differ: most price per sq ft with waste averaged in. The yield warning flags jobs where that loses money; pricing by slab is a later option |
+| Typical slab sizes per material (granite 114×66, quartz 120×56, marble 108×64) | Sources give 9–10' × 5–6' for natural stone; quartz standard slabs are narrower. Real sizes vary by slab, so this is an estimate |

@@ -9,6 +9,7 @@ import {
   outwardNormal,
   type Point,
 } from '../counter/shapes';
+import type { SlabPlan } from '../counter/slabs';
 import { formatInches } from '../counter/units';
 
 const NEXT_EDGE: Record<EdgeType, EdgeType> = { finished: 'wall', wall: 'backsplash', backsplash: 'finished' };
@@ -20,10 +21,12 @@ interface Props {
   counter: Counter;
   onChange: (counter: Counter) => void;
   invalid?: boolean;
+  /** Seams and numbered pieces from the slab plan. */
+  plan?: SlabPlan;
 }
 
 /** Plan view of the counter. Click an edge to change what it is; click an outside corner to round it. */
-export function CounterDrawing({ counter, onChange, invalid }: Props) {
+export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
   const hatchId = `hatch${useId().replace(/:/g, '')}`;
   const points = outline(counter);
   const names = edgeNames(counter.kind);
@@ -97,6 +100,17 @@ export function CounterDrawing({ counter, onChange, invalid }: Props) {
       })}
 
       <path d={outlinePath} className="stone" />
+
+      {plan?.seams.map((s, i) => (
+        <line key={`seam${i}`} x1={s.a.x} y1={s.a.y} x2={s.b.x} y2={s.b.y} className="seam" />
+      ))}
+      {plan && plan.pieces.length > 1 &&
+        plan.pieces.map((p) => (
+          <g key={`piece${p.number}`} className="piece-number" aria-hidden="true">
+            <circle cx={p.rect.x + p.rect.w / 2} cy={p.rect.y + p.rect.h / 2} r={2.6 * k} />
+            <text x={p.rect.x + p.rect.w / 2} y={p.rect.y + p.rect.h / 2} fontSize={3 * k}>{p.number}</text>
+          </g>
+        ))}
 
       {counter.edges.map((type, i) => {
         const start = cornerEnds[i].b;
