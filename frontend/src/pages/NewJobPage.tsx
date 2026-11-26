@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createJob } from '../api';
+import { DEFAULT_PRICE_LIST } from '../counter/priceList';
 
-const MATERIALS = ['Granite', 'Quartz', 'Marble'];
+const MATERIALS = DEFAULT_PRICE_LIST.materials.map((m) => m.name);
 
 export function NewJobPage() {
   const navigate = useNavigate();

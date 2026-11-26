@@ -30,8 +30,15 @@ namespace CounterQuote.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Drawing")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Material")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("QuoteTotal")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

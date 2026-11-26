@@ -3,6 +3,9 @@ export interface Job {
   customerName: string;
   material: string;
   createdDate: string;
+  /** JSON of the drawing and quote options (see counter/drawing.ts); empty until first quoted. */
+  drawing: string;
+  quoteTotal: number;
 }
 
 export type NewJob = Pick<Job, 'customerName' | 'material'>;

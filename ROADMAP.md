@@ -34,11 +34,12 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 
 ## Step 3 — Quote panel and saving
 
-- [ ] Options: material, level, edge profile, cutouts
-- [ ] Itemized quote panel, live total
-- [ ] Save drawing + options + total to the job (JSON column, EF migration)
-- [ ] Jobs list shows shape and total
-- [ ] Unsaved-changes indicator and warning
+- [x] Options: material, level, edge profile, cutouts
+- [x] Itemized quote panel, live total
+- [x] Save drawing + options + total to the job (JSON column, EF migration)
+- [x] Jobs list shows shape and total
+- [x] Unsaved-changes indicator and warning (in-app links and closing the tab), Ctrl+S to save
+- [x] End-to-end check in a real browser (save, reload, list)
 
 **After Step 3 the submission is complete.**
 
@@ -81,3 +82,10 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 | Only outside corners between two finished edges can be rounded | A corner against a wall, or an inside corner, is never radiused |
 | Walls drawn as hatched bands | Reads like an architect's plan; you see at a glance which sides are exposed |
 | Labels and sizes in inches; feet-and-inches shown as a hint | Fabrication drawings are in inches; customers think in feet |
+| Drawing and options saved as one JSON column, with a version number | The shape can grow (angles, islands) without a migration each time; the version lets old records be upgraded |
+| A damaged or unknown saved drawing falls back to the default | One bad record must not break the page |
+| Total saved in its own column | The jobs list shows prices without knowing the pricing rules |
+| The saved total comes from the browser | Fine for an internal shop tool; a customer-facing version should re-price on the server |
+| One edge profile for the whole job | How most kitchens are ordered; mixing profiles per edge is a later step |
+| Changing material on the quote updates the job's material | One source of truth; the list and the quote never disagree |
+| Quote panel stays visible while scrolling | The price is what the user is watching while they draw |

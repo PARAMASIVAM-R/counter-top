@@ -48,4 +48,33 @@ public class JobsControllerTests : IDisposable
         Assert.Equal("Marble", job.Material);
         Assert.Equal(new DateTime(2026, 1, 2), job.CreatedDate);
     }
+
+    [Fact]
+    public async Task Drawing_and_quote_total_are_saved()
+    {
+        using AppDbContext db = CreateDb();
+        db.Jobs.Add(new Job { CustomerName = "Rivera", Material = "Quartz" });
+        db.SaveChanges();
+        int id = db.Jobs.Single().Id;
+        const string drawing = """{"version":1,"counter":{"kind":"L"}}""";
+
+        await new JobsController(db).Update(id, new Job { CustomerName = "Rivera", Material = "Quartz", Drawing = drawing, QuoteTotal = 4012.35m });
+
+        using AppDbContext readDb = CreateDb();
+        Job job = Assert.Single(await new JobsController(readDb).GetAll());
+        Assert.Equal(drawing, job.Drawing);
+        Assert.Equal(4012.35m, job.QuoteTotal);
+    }
+
+    [Fact]
+    public async Task New_jobs_start_without_a_drawing()
+    {
+        using (AppDbContext db = CreateDb())
+            await new JobsController(db).Create(new Job { CustomerName = "Rivera", Material = "Quartz" });
+
+        using AppDbContext readDb = CreateDb();
+        Job job = Assert.Single(await new JobsController(readDb).GetAll());
+        Assert.Equal("", job.Drawing);
+        Assert.Equal(0m, job.QuoteTotal);
+    }
 }
