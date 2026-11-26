@@ -13,7 +13,7 @@ import { HelpBox, HelpProvider } from '../help/Help';
 // three.js is large, so the 3D view is only downloaded when it is first opened.
 const Counter3D = lazy(() => import('../components/Counter3D'));
 import { quote as priceQuote } from '../counter/quote';
-import { createCounter, validateCounter } from '../counter/shapes';
+import { isUntouched, type ShapeKind, switchShape, validateCounter } from '../counter/shapes';
 import { planSlabs } from '../counter/slabs';
 
 const prices = DEFAULT_PRICE_LIST;
@@ -69,6 +69,13 @@ function JobEditor({ job }: { job: Job }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [canSave, save]);
 
+  // A new shape keeps the depth; sizes, edges and corners start fresh, so ask first if any were set.
+  const changeShape = (kind: ShapeKind) => {
+    const name = { straight: 'a straight counter', L: 'an L-shape', U: 'a U-shape' }[kind];
+    if (!isUntouched(counter) && !window.confirm(`Change to ${name}? The lengths, edges and corners you set will start again from the standard ${kind === 'straight' ? 'size' : 'sizes'}. The depth is kept.`)) return;
+    setDrawing({ ...drawing, counter: switchShape(counter, kind) });
+  };
+
   const status = save.isPending ? 'Saving…' : dirty ? 'Unsaved changes' : neverSaved ? 'Not quoted yet' : 'Saved';
 
   return (
@@ -88,7 +95,7 @@ function JobEditor({ job }: { job: Job }) {
         <div className="main-column">
           <section className="card drawing-card" aria-label="Drawing">
             <div className="toolbar">
-              <ShapePicker kind={counter.kind} onSelect={(kind) => setDrawing({ ...drawing, counter: createCounter(kind) })} />
+              <ShapePicker kind={counter.kind} onSelect={changeShape} />
               <div className="segmented segmented-small" role="tablist" aria-label="View">
                 <button type="button" role="tab" aria-selected={view === 'plan'} className={view === 'plan' ? 'active' : ''} onClick={() => setView('plan')}>
                   Plan

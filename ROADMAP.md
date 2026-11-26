@@ -61,6 +61,12 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 - [x] 3D view (three.js): stone top on cabinets, walls, backsplash, seams, edge profile and radius corners; updates as you type
 - [x] "What does this mean?" box: every trade word on screen explained in plain words, with pictures for edge profiles, sinks, corners, backsplash and seams
 
+## Step 4c — Polish
+
+- [x] Jobs list: shape thumbnail in its stone, stone name, created date, whole row clickable, "Not quoted yet" badge, empty state
+- [x] New job: cursor in the name field, says what happens next, material buttons like the job page
+- [x] Switching shape keeps the depth, and asks first if lengths, edges or corners would be lost
+
 ## Step 5 — Optional
 
 - [ ] Angled legs and bumpouts

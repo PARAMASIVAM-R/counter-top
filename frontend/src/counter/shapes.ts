@@ -69,6 +69,23 @@ export function createCounter(kind: ShapeKind): Counter {
   }
 }
 
+/** A new shape that keeps the depth already typed (the cabinets don't change when the layout does). */
+export function switchShape(counter: Counter, kind: ShapeKind): Counter {
+  const next = createCounter(kind);
+  next.legs = next.legs.map((leg, i) => ({ ...leg, depth: (counter.legs[i] ?? counter.legs[0]).depth }));
+  return next;
+}
+
+/** True if nothing but the depth has been changed from the preset, so switching shape loses no work. */
+export function isUntouched(counter: Counter): boolean {
+  const preset = createCounter(counter.kind);
+  return (
+    counter.legs.every((leg, i) => leg.length === preset.legs[i].length) &&
+    counter.edges.every((e, i) => e === preset.edges[i]) &&
+    counter.corners.every((c, i) => c === preset.corners[i])
+  );
+}
+
 /** The outline, clockwise on screen, starting at the back-left corner. */
 export function outline(counter: Counter): Point[] {
   const { kind, legs } = counter;
