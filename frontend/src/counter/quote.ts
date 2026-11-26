@@ -1,5 +1,5 @@
 import type { CutoutId, PriceList } from './priceList';
-import { areaSqIn, canRoundCorner, type Counter, edgeLength, outline, validateCounter } from './shapes';
+import { type Counter, measure, round2, validateCounter } from './shapes';
 
 export interface QuoteOptions {
   materialId: string;
@@ -47,13 +47,7 @@ export function quote(counter: Counter, options: QuoteOptions, prices: PriceList
     return { lines: [], areaSqFt: 0, finishedEdgeFt: 0, backsplashFt: 0, subtotal: 0, minimumApplied: false, total: 0, errors };
   }
 
-  const points = outline(counter);
-  const areaSqFt = round2(areaSqIn(points) / 144);
-  const inchesOf = (type: Counter['edges'][number]) =>
-    counter.edges.reduce((sum, edge, i) => (edge === type ? sum + edgeLength(points, i) : sum), 0);
-  const finishedEdgeFt = round2(inchesOf('finished') / 12);
-  const backsplashFt = round2(inchesOf('backsplash') / 12);
-  const radiusCorners = counter.corners.filter((c, i) => c === 'radius' && canRoundCorner(counter, points, i)).length;
+  const { areaSqFt, finishedEdgeFt, backsplashFt, radiusCorners } = measure(counter);
 
   const lines: QuoteLine[] = [
     line(`${material.name}, level ${options.level}`, areaSqFt, 'sq ft', materialPrice),
@@ -79,8 +73,4 @@ export function quote(counter: Counter, options: QuoteOptions, prices: PriceList
 
 function line(label: string, quantity: number, unit: Unit, unitPrice: number): QuoteLine {
   return { label, quantity, unit, unitPrice, amount: round2(quantity * unitPrice) };
-}
-
-function round2(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
 }

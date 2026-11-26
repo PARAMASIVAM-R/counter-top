@@ -24,12 +24,13 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 
 ## Step 2 — Drawing screen
 
-- [ ] Shape buttons: Straight / L / U
-- [ ] Inputs for each leg's length and depth (inches), live update
-- [ ] SVG drawing, scaled to fit, dimension labels on every edge
-- [ ] Click an edge to cycle wall → finished → backsplash (distinct styles + legend)
-- [ ] Click an outside corner to toggle square / radius
-- [ ] Feet-and-inches display (`10' 0"`, `25½"`)
+- [x] Shape buttons: Straight / L / U
+- [x] Inputs for each leg's length and depth (inches), live update
+- [x] SVG drawing, scaled to fit, dimension labels on every edge
+- [x] Click an edge to cycle finished → wall → backsplash (distinct styles + legend)
+- [x] Click an outside corner to toggle square / radius
+- [x] Feet-and-inches display (`10' 0"`, `25½"`) and input (`25 1/2`, `10' 6"`)
+- [x] Keyboard and screen-reader access for edges and corners
 
 ## Step 3 — Quote panel and saving
 
@@ -74,3 +75,9 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 | Prices are installed price per sq ft, by material level | How most shops quote retail customers; levels (groups) are how slabs are tiered |
 | Each line rounded to cents; quantities to 2 decimals | What the customer sees on the quote adds up exactly |
 | Pricing runs in the frontend | Live price as you draw; the saved job stores the total |
+| Drawing in plain SVG, no library | Sharp at any size, every edge is a clickable element, nothing extra to install |
+| Sizes typed as text, not number fields | Shops write `25 1/2` and `10' 6"`; a number field rejects both |
+| Leg length measured along the wall, into the corner | How a tape measure is used on site; inner front lengths are worked out and labelled |
+| Only outside corners between two finished edges can be rounded | A corner against a wall, or an inside corner, is never radiused |
+| Walls drawn as hatched bands | Reads like an architect's plan; you see at a glance which sides are exposed |
+| Labels and sizes in inches; feet-and-inches shown as a hint | Fabrication drawings are in inches; customers think in feet |

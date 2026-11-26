@@ -133,6 +133,48 @@ export function legNames(kind: ShapeKind): string[] {
   return { straight: ['Run'], L: ['Left run', 'Back run'], U: ['Left run', 'Back run', 'Right run'] }[kind];
 }
 
+/** Names for each edge, in outline order, for labels and screen readers. */
+export function edgeNames(kind: ShapeKind): string[] {
+  return {
+    straight: ['Back', 'Right end', 'Front', 'Left end'],
+    L: ['Back wall', 'Back run end', 'Back run front', 'Left run front', 'Left run end', 'Left wall'],
+    U: ['Back wall', 'Right wall', 'Right run end', 'Right run front', 'Back run front', 'Left run front', 'Left run end', 'Left wall'],
+  }[kind];
+}
+
+export interface Measurements {
+  areaSqFt: number;
+  finishedEdgeFt: number;
+  backsplashFt: number;
+  radiusCorners: number;
+}
+
+/** What the shop charges by. Quantities are rounded to 2 decimals, as they appear on the quote. */
+export function measure(counter: Counter): Measurements {
+  const points = outline(counter);
+  const inchesOf = (type: EdgeType) =>
+    counter.edges.reduce((sum, edge, i) => (edge === type ? sum + edgeLength(points, i) : sum), 0);
+  return {
+    areaSqFt: round2(areaSqIn(points) / 144),
+    finishedEdgeFt: round2(inchesOf('finished') / 12),
+    backsplashFt: round2(inchesOf('backsplash') / 12),
+    radiusCorners: counter.corners.filter((c, i) => c === 'radius' && canRoundCorner(counter, points, i)).length,
+  };
+}
+
+/** Unit vector pointing out of the counter, away from edge i. */
+export function outwardNormal(points: Point[], i: number): Point {
+  const a = points[i];
+  const b = points[(i + 1) % points.length];
+  const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const sign = Math.sign(signedArea(points)) || 1;
+  return { x: (sign * (b.y - a.y)) / length, y: (sign * -(b.x - a.x)) / length };
+}
+
+export function round2(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
 /** Area in square inches (shoelace formula). Shared corners are counted once because it works on the outline. */
 export function areaSqIn(points: Point[]): number {
   return Math.abs(signedArea(points));
