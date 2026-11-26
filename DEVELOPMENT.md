@@ -29,6 +29,7 @@ The web app runs on port 5173 and the API on 5080. Vite sends `/api` to the API.
 | Run the web app | `frontend` | `npm install`, then `npm run dev` |
 | Run the tests | `backend` | `dotnet test` |
 | Check the frontend | `frontend` | `npm run build` |
+| Run the pricing tests | `frontend` | `npm test` (Docker: `docker compose run --rm --no-deps web npm test`) |
 | Change the database | `backend/CounterQuote.Api` | `dotnet tool restore`, then `dotnet ef migrations add <Name>` |
 
 With Docker instead, from the project folder: `docker compose up --build`, `docker compose run --rm api dotnet test ..`, `docker compose run --rm api dotnet ef migrations add <Name>`, `docker compose restart api`. Changes in `frontend/src` show up by themselves. After adding an npm package, run `docker compose up --build` again.
