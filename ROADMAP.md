@@ -54,6 +54,13 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 - [ ] Printable customer quote
 - [ ] Input checks (depth under 12", leg shorter than depth, etc.)
 
+## Step 4b — Easier to understand, closer to real
+
+- [x] Stone colours per material (speckled granite, veined marble, plain quartz); picking a colour sets its price level
+- [x] Stone pattern drawn on the plan, the slab layout and the colour swatches
+- [x] 3D view (three.js): stone top on cabinets, walls, backsplash, seams, edge profile and radius corners; updates as you type
+- [x] "What does this mean?" box: every trade word on screen explained in plain words, with pictures for edge profiles, sinks, corners, backsplash and seams
+
 ## Step 5 — Optional
 
 - [ ] Angled legs and bumpouts
@@ -96,4 +103,9 @@ The foundation. Pure TypeScript, fully unit-tested, so the maths can be trusted 
 | Pieces laid out in rows along the slab | How counter strips are nested in practice; simple to explain and test |
 | 1" trimmed off each slab edge, ½" saw kerf between pieces | Slab edges are rough; the blade removes material. Both are constants to confirm with a fabricator |
 | Slab estimate does not change the price | Shops differ: most price per sq ft with waste averaged in. The yield warning flags jobs where that loses money; pricing by slab is a later option |
+| Stone colour sets the level; the Level dropdown is gone | In shops the stone you pick decides its price group; "level" alone meant nothing to a customer |
+| Stone patterns are generated, not photos | No image licensing, any colour can be added from a few hex values, and the same pattern is used in plan, slabs, swatches and 3D |
+| 3D view in plain three.js, loaded only when opened | The plan view stays light; the 3D code (135 KB gzipped) downloads on first use |
+| The 3D camera re-aims only when the shape changes | Typing a size shouldn't make the view jump |
+| Help box explains words on hover, focus or tap | Shop staff and customers don't know trade terms; it works by mouse, keyboard and touch |
 | Typical slab sizes per material (granite 114×66, quartz 120×56, marble 108×64) | Sources give 9–10' × 5–6' for natural stone; quartz standard slabs are narrower. Real sizes vary by slab, so this is an estimate |

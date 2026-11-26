@@ -55,11 +55,11 @@ ul.errors { margin: 0 0 8px; padding-left: 28px; }
 .workspace .card { margin: 0; }
 .main-column { display: grid; gap: 16px; min-width: 0; }
 .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
-.quote-card { position: sticky; top: 16px; }
+.side { display: grid; gap: 16px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
 @media (max-width: 1100px) { .panels { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 860px) {
   .workspace { grid-template-columns: minmax(0, 1fr); }
-  .quote-card { position: static; }
+  .side { position: static; max-height: none; }
 }
 
 /* Options */
@@ -95,6 +95,35 @@ th.amount { text-align: right; }
 .segmented button:hover { background: #f1f4f7; }
 .segmented button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .segmented svg { width: 16px; height: 16px; fill: currentColor; opacity: 0.85; }
+.segmented-small button { padding: 5px 10px; }
+.drawing-tip { margin: 0 0 4px; font-size: 12px; }
+
+/* Plain-words help */
+.term { border-bottom: 1px dotted var(--muted); cursor: help; }
+.term:hover, .term:focus-visible { border-bottom-color: var(--accent); color: var(--accent); }
+.help-box { margin: 0; }
+.help-box h3 { margin: 0 0 6px; font-size: 15px; }
+.help-box p { margin: 6px 0 0; line-height: 1.45; }
+.help-picture { display: block; width: 100%; max-width: 160px; height: auto; margin: 4px 0; }
+.help-stone { fill: var(--stone); stroke: var(--stone-edge); stroke-width: 1; }
+.help-sink { fill: #dfe6ec; stroke: #7d8b97; stroke-width: 1; }
+.help-wall { fill: #dde1e5; }
+.help-seam { stroke: var(--seam); stroke-width: 1.5; stroke-dasharray: 3 2; }
+
+/* Stone colours */
+.colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin-top: 4px; }
+.color { display: grid; gap: 2px; padding: 4px; border: 2px solid transparent; border-radius: var(--radius); background: none; font: inherit; text-align: left; cursor: pointer; color: var(--ink); }
+.color:hover { border-color: var(--line-strong); }
+.color.active { border-color: var(--accent); background: var(--accent-soft); }
+.swatch-stone { display: block; height: 44px; border-radius: 4px; background-size: 300%; background-position: center; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.color-name { font-size: 12px; font-weight: 600; line-height: 1.2; }
+.color-level { font-size: 11px; color: var(--muted); }
+
+/* 3D view */
+.view-3d-canvas { width: 100%; border-radius: var(--radius); overflow: hidden; background: linear-gradient(#f3f4f6, #e9e6e0); }
+.view-3d-canvas canvas { display: block; touch-action: none; }
+.view-3d-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; }
+.link-button { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; }
 
 /* Drawing */
 .drawing { display: block; width: 100%; height: auto; max-height: 520px; }
@@ -128,6 +157,7 @@ th.amount { text-align: right; }
 
 /* Seams and pieces on the drawing */
 .drawing .seam { stroke: var(--seam); stroke-width: 2; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; pointer-events: none; }
+.drawing .seam-hit { stroke: transparent; stroke-width: 12; vector-effect: non-scaling-stroke; cursor: help; }
 .drawing .piece-number { pointer-events: none; }
 .drawing .piece-number circle { fill: var(--surface); stroke: var(--stone-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .drawing .piece-number text { fill: var(--muted); text-anchor: middle; dominant-baseline: central; font-weight: 600; }
@@ -138,9 +168,11 @@ th.amount { text-align: right; }
 .slab { margin: 0; }
 .slab svg { display: block; width: 100%; height: auto; }
 .slab figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.slab-stone { fill: #f7f5f1; stroke: var(--stone-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.slab-stone { stroke: var(--stone-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.slab-offcut { fill: rgba(255, 255, 255, 0.62); }
 .slab-trim { fill: none; stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
-.slab-piece { fill: var(--stone); stroke: var(--ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.slab-piece { stroke: var(--ink); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.slab-label-bg { fill: rgba(255, 255, 255, 0.9); stroke: var(--stone-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .slab-label { fill: var(--ink); text-anchor: middle; dominant-baseline: central; font-weight: 600; }
 .piece-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 20px; }
 .piece-list li { display: inline-flex; align-items: center; gap: 6px; }

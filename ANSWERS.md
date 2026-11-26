@@ -21,7 +21,7 @@ I charge for what a shop pays for in stone and labour, using the unit each charg
 
 | Charge | Unit | Default | Why |
 |---|---|---|---|
-| Stone, by material and level | sq ft, installed | Granite $55 / $75 / $95, Quartz $70 / $90 / $120, Marble $90 / $120 / $150 | Mid-range of the published ranges |
+| Stone, by material and level | sq ft, installed | Granite $55 / $75 / $95, Quartz $70 / $90 / $120, Marble $90 / $120 / $150 | Mid-range of the published ranges. The customer picks a stone colour (e.g. Uba Tuba granite) and the colour sets the level, as in a shop's price book |
 | Edge profile | linear ft of **finished** edges only | Eased free, bevel $5, half bullnose $8, full bullnose $12, ogee $20 | Edges against a wall are never polished, so you click each edge to mark it wall, finished or backsplash |
 | Cutouts | each | Undermount sink $250, drop-in $150, cooktop $150, faucet hole $25 | An undermount cutout costs more because its edge is polished |
 | Radius corner | each, outside corners only | $50 | Only a corner between two finished edges can be rounded |
@@ -39,7 +39,8 @@ TODO: check this section and rewrite it in your own words.
 I used Claude Code throughout: for the research, for planning and for writing most of the code.
 
 - **How I led it:** I had it research the domain first and write a roadmap (`ROADMAP.md`) before any code, with required work separated from stand-out features. Then I had it build one step at a time (pricing engine, drawing, quote and saving, slab estimate), reviewing each step in the browser before moving on. Every step was committed separately so the history shows how it was built.
-- **Where it helped:** turning cost-guide ranges into a pricing model, the geometry (outline, area, outside corners), and the testing. There are 62 unit tests whose expected answers are worked out by hand in comments, 4 backend tests, and a scripted browser check that saves, reloads and compares with the API.
+- **Where it helped:** turning cost-guide ranges into a pricing model, the geometry (outline, area, outside corners), the 3D view, and the testing.
+- **Where I pushed it:** after trying the first version, I found the trade words hard to follow and the drawing too abstract. I asked for a plain-words help box, real stone colours, and a live 3D preview. There are 62 unit tests whose expected answers are worked out by hand in comments, 4 backend tests, and a scripted browser check that saves, reloads and compares with the API.
 - **What I checked or changed:** The decisions log in `ROADMAP.md` records each choice and why. Browser screenshots caught issues the tests didn't, such as size labels reading the wrong way. I kept the slab estimate out of the price on purpose, and kept every guessed price marked as an assumption.
 
 ## 4. What would you ask an industry expert to check or improve this?
@@ -95,9 +96,11 @@ The database migrates itself on start (one new migration adds the drawing and qu
 **Try first:** open *Sample: Kitchen*.
 1. Switch between Straight, L and U. Type sizes the way shops write them: `120`, `25 1/2`, `10' 6"`.
 2. Click edges on the drawing to switch between finished, wall and backsplash, and watch the edge and backsplash lines in the quote change. Click a corner dot to round it.
-3. Add a sink and pick a material, level and edge profile.
-4. Look at the **Slab layout**: change the material (slab sizes differ) or lengthen a run, and watch the seams and slab count change.
-5. Save, reload, and check the jobs list.
+3. Pick a material and a stone colour, an edge profile and a sink. The drawing, slabs and 3D view all show the chosen stone.
+4. Open **3D view** and keep changing sizes, colour or edge profile: the 3D counter updates as you type. Drag to turn it.
+5. Point at any underlined word (backsplash, bullnose, seam, level…). The box on the right explains it in plain words, with a picture for edge shapes and sink types.
+6. Look at the **Slab layout**: change the material (slab sizes differ) or lengthen a run, and watch the seams and slab count change.
+7. Save, reload, and check the jobs list.
 
 **Easy to miss:**
 - Only real outside corners get a dot; inside and wall corners can't be rounded.
@@ -106,14 +109,19 @@ The database migrates itself on start (one new migration adds the drawing and qu
 - Ctrl+S saves; leaving with unsaved changes asks first.
 - Edges and corners work by keyboard (Tab, then Enter).
 - Numbers on the drawing match the pieces on the slabs.
+- In 3D, the edge profile changes the shape of the stone's edge, and seams show as thin lines.
+- The 3D library is only downloaded when the 3D view is first opened, so the page stays fast.
 
 **Known problems and limits:**
 - Prices are ballpark defaults, not one shop's rates.
 - The slab estimate lays pieces out in rows; a person nesting pieces by hand can sometimes do better.
+- Stone patterns are generated, not photos of real slabs, so they show the look of a stone, not a specific slab.
+- Sinks and cooktops are priced but not placed on the drawing or in 3D yet.
 - On a phone the page works, but the drawing gets small.
 
 ## Screenshots
 
-- `screenshots/1-l-shape-quote.png`: L-shaped kitchen with backsplash, radius corner, sink and the itemized quote
-- `screenshots/2-u-shape-slabs.png`: U-shape needing 2 slabs, with seams and the slab layout
-- `screenshots/3-jobs-list.png`: jobs list with shapes and quoted totals
+- `screenshots/1-l-shape-quote.png`: L-shaped kitchen in Carrara-look quartz with backsplash, radius corner, sink, the itemized quote and the plain-words help box
+- `screenshots/2-u-shape-slabs.png`: U-shape in Santa Cecilia granite needing 2 slabs, with seams and the slab layout
+- `screenshots/3-3d-view.png`: the same U-shape in the 3D view
+- `screenshots/4-jobs-list.png`: jobs list with shapes and quoted totals

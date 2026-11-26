@@ -92,6 +92,19 @@ describe('quote', () => {
     expect(result.minimumApplied).toBe(false);
   });
 
+  it('names the stone colour on the material line', () => {
+    const result = quote(createCounter('straight'), { ...eased, colorId: 'uba-tuba' }, DEFAULT_PRICE_LIST);
+    expect(result.lines[0]).toMatchObject({ label: 'Uba Tuba granite, level 1', term: 'granite' });
+  });
+
+  it('every line says which glossary entry explains it', () => {
+    const counter = createCounter('straight');
+    counter.edges[0] = 'backsplash';
+    counter.corners[2] = 'radius';
+    const result = quote(counter, { ...eased, edgeProfileId: 'ogee', cutouts: { dropInSink: 1 } }, DEFAULT_PRICE_LIST);
+    expect(result.lines.map((l) => l.term)).toEqual(['granite', 'ogee', 'dropInSink', 'radiusCorner', 'backsplash']);
+  });
+
   it('eased edge shows as a free line', () => {
     const line = quote(createCounter('straight'), eased, DEFAULT_PRICE_LIST).lines[1];
     expect(line).toMatchObject({ label: 'Eased edge', amount: 0 });

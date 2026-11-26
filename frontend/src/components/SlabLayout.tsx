@@ -1,9 +1,14 @@
+import { useId } from 'react';
+import type { StoneColor } from '../counter/priceList';
 import type { Point } from '../counter/shapes';
 import { SLAB_TRIM, type PlacedPiece, type SlabPlan } from '../counter/slabs';
 import { formatInches } from '../counter/units';
+import { Term } from '../help/Help';
+import { StonePattern } from './StonePattern';
 
-/** Each slab to scale, with the pieces cut from it. Numbers match the pieces on the drawing. */
-export function SlabLayout({ plan, material }: { plan: SlabPlan; material: string }) {
+/** Each slab to scale, in the chosen stone, with the pieces cut from it. Numbers match the pieces on the drawing. */
+export function SlabLayout({ plan, material, color }: { plan: SlabPlan; material: string; color: StoneColor }) {
+  const stoneId = `slabstone${useId().replace(/:/g, '')}`;
   if (plan.problems.length) return <p className="errors">{plan.problems.join(' ')}</p>;
   if (!plan.slabs) return <p className="muted">Fix the drawing to see the slab layout.</p>;
 
@@ -12,16 +17,23 @@ export function SlabLayout({ plan, material }: { plan: SlabPlan; material: strin
   return (
     <>
       <p className="slab-summary">
-        <strong>{plan.slabs} {plan.slabs === 1 ? 'slab' : 'slabs'}</strong> of {material}, {formatInches(length)} × {formatInches(width)}
-        <span className="muted"> · {seamText(plan.seams.length)} · {plan.yieldPercent}% of the stone used</span>
+        <strong>{plan.slabs} <Term id="slab">{plan.slabs === 1 ? 'slab' : 'slabs'}</Term></strong> of {color.name} {material.toLowerCase()},{' '}
+        {formatInches(length)} × {formatInches(width)}
+        <span className="muted">
+          {' '}· <Term id="seam">{seamText(plan.seams.length)}</Term> · <Term id="yield">{plan.yieldPercent}% of the stone used</Term>
+        </span>
       </p>
       <div className="slabs">
         {Array.from({ length: plan.slabs }, (_, s) => (
           <figure key={s} className="slab">
             <svg viewBox={`-1 -1 ${length + 2} ${width + 2}`} role="img" aria-label={`Slab ${s + 1}: ${piecesOn(plan.pieces, s)}`}>
-              <rect x={0} y={0} width={length} height={width} className="slab-stone" />
+              <defs>
+                <StonePattern id={stoneId} color={color} />
+              </defs>
+              <rect x={0} y={0} width={length} height={width} fill={`url(#${stoneId})`} className="slab-stone" />
+              <rect x={0} y={0} width={length} height={width} className="slab-offcut" />
               <rect x={SLAB_TRIM} y={SLAB_TRIM} width={length - 2 * SLAB_TRIM} height={width - 2 * SLAB_TRIM} className="slab-trim" />
-              {plan.pieces.filter((p) => p.slab === s).map((p) => <SlabPiece key={p.number} piece={p} k={k} />)}
+              {plan.pieces.filter((p) => p.slab === s).map((p) => <SlabPiece key={p.number} piece={p} k={k} fill={`url(#${stoneId})`} />)}
             </svg>
             <figcaption>Slab {s + 1}</figcaption>
           </figure>
@@ -43,7 +55,7 @@ export function SlabLayout({ plan, material }: { plan: SlabPlan; material: strin
   );
 }
 
-function SlabPiece({ piece, k }: { piece: PlacedPiece; k: number }) {
+function SlabPiece({ piece, k, fill }: { piece: PlacedPiece; k: number; fill: string }) {
   const [w, h] = piece.rotated ? [piece.depth, piece.length] : [piece.length, piece.depth];
   const cx = piece.x + w / 2;
   const cy = piece.y + h / 2;
@@ -51,11 +63,12 @@ function SlabPiece({ piece, k }: { piece: PlacedPiece; k: number }) {
     <g>
       <title>{`${piece.number}. ${piece.name}: ${formatInches(piece.length)} × ${formatInches(piece.depth)}`}</title>
       {piece.shape ? (
-        <polygon points={placeShape(piece).map((p) => `${p.x},${p.y}`).join(' ')} className="slab-piece" />
+        <polygon points={placeShape(piece).map((p) => `${p.x},${p.y}`).join(' ')} fill={fill} className="slab-piece" />
       ) : (
-        <rect x={piece.x} y={piece.y} width={w} height={h} className="slab-piece" />
+        <rect x={piece.x} y={piece.y} width={w} height={h} fill={fill} className="slab-piece" />
       )}
-      <text x={cx} y={cy} fontSize={5 * k} className="slab-label">{piece.number}</text>
+      <circle cx={cx} cy={cy} r={3.6 * k} className="slab-label-bg" />
+      <text x={cx} y={cy} fontSize={4.4 * k} className="slab-label">{piece.number}</text>
     </g>
   );
 }

@@ -19,10 +19,12 @@ export function materialName(id: string): string {
 }
 
 export function defaultDrawing(material: string): Drawing {
+  const stone = DEFAULT_PRICE_LIST.materials.find((m) => m.id === materialIdFor(material))!;
+  const color = stone.colors[0];
   return {
     version: 1,
     counter: createCounter('L'),
-    options: { materialId: materialIdFor(material), level: 1, edgeProfileId: 'eased', cutouts: {} },
+    options: { materialId: stone.id, colorId: color.id, level: color.level, edgeProfileId: 'eased', cutouts: {} },
   };
 }
 
@@ -71,6 +73,7 @@ function isOptions(o: unknown): o is QuoteOptions {
   const options = o as QuoteOptions;
   return (
     typeof options.materialId === 'string' &&
+    (options.colorId === undefined || typeof options.colorId === 'string') &&
     Number.isInteger(options.level) &&
     typeof options.edgeProfileId === 'string' &&
     !!options.cutouts && typeof options.cutouts === 'object' &&

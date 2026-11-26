@@ -7,14 +7,20 @@ describe('saved drawings', () => {
     const drawing = defaultDrawing('Quartz');
     drawing.counter = createCounter('U');
     drawing.counter.edges[0] = 'backsplash';
-    drawing.options = { materialId: 'quartz', level: 2, edgeProfileId: 'ogee', cutouts: { undermountSink: 1 } };
+    drawing.options = { materialId: 'quartz', colorId: 'carrara-look', level: 2, edgeProfileId: 'ogee', cutouts: { undermountSink: 1 } };
     expect(parseDrawing(serializeDrawing(drawing), 'Quartz')).toEqual(drawing);
+  });
+
+  it('still reads quotes saved before stone colours existed', () => {
+    const old = { version: 1, counter: createCounter('L'), options: { materialId: 'granite', level: 2, edgeProfileId: 'eased', cutouts: {} } };
+    expect(parseDrawing(JSON.stringify(old), 'Granite').options).toEqual(old.options);
   });
 
   it('a job that was never quoted starts as an L in its material', () => {
     const drawing = parseDrawing('', 'Marble');
     expect(drawing.counter.kind).toBe('L');
     expect(drawing.options.materialId).toBe('marble');
+    expect(drawing.options).toMatchObject({ colorId: 'carrara', level: 1 }); // first marble colour, and its level
   });
 
   it.each([

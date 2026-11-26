@@ -162,6 +162,33 @@ export function measure(counter: Counter): Measurements {
   };
 }
 
+export interface RoundedOutline {
+  points: Point[];
+  rounded: boolean[];
+  /** Where the outline enters (a) and leaves (b) each corner; the corner point itself unless it is rounded. */
+  ends: { a: Point; b: Point }[];
+}
+
+/** The outline with radius corners rounded off, for drawing (plan view and 3D). */
+export function roundedOutline(counter: Counter, radius: number): RoundedOutline {
+  const points = outline(counter);
+  const n = points.length;
+  const rounded = points.map((_, i) => counter.corners[i] === 'radius' && canRoundCorner(counter, points, i));
+  const ends = points.map((p, i) => {
+    if (!rounded[i]) return { a: p, b: p };
+    const prev = points[(i - 1 + n) % n];
+    const next = points[(i + 1) % n];
+    const r = Math.min(radius, edgeLength(points, (i - 1 + n) % n) / 2, edgeLength(points, i) / 2);
+    return { a: towards(p, prev, r), b: towards(p, next, r) };
+  });
+  return { points, rounded, ends };
+}
+
+function towards(from: Point, to: Point, distance: number): Point {
+  const len = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+  return { x: from.x + ((to.x - from.x) / len) * distance, y: from.y + ((to.y - from.y) / len) * distance };
+}
+
 /** Unit vector pointing out of the counter, away from edge i. */
 export function outwardNormal(points: Point[], i: number): Point {
   const a = points[i];

@@ -1,4 +1,5 @@
 import { type KeyboardEvent, useId } from 'react';
+import type { StoneColor } from '../counter/priceList';
 import {
   canRoundCorner,
   type Counter,
@@ -8,9 +9,12 @@ import {
   outline,
   outwardNormal,
   type Point,
+  roundedOutline,
 } from '../counter/shapes';
 import type { SlabPlan } from '../counter/slabs';
 import { formatInches } from '../counter/units';
+import { useShowHelp } from '../help/Help';
+import { StonePattern } from './StonePattern';
 
 const NEXT_EDGE: Record<EdgeType, EdgeType> = { finished: 'wall', wall: 'backsplash', backsplash: 'finished' };
 const EDGE_LABEL: Record<EdgeType, string> = { finished: 'finished edge', wall: 'against wall', backsplash: 'backsplash' };
@@ -23,11 +27,15 @@ interface Props {
   invalid?: boolean;
   /** Seams and numbered pieces from the slab plan. */
   plan?: SlabPlan;
+  /** The stone to fill the counter with. */
+  color?: StoneColor;
 }
 
 /** Plan view of the counter. Click an edge to change what it is; click an outside corner to round it. */
-export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
-  const hatchId = `hatch${useId().replace(/:/g, '')}`;
+export function CounterDrawing({ counter, onChange, invalid, plan, color }: Props) {
+  const uid = useId().replace(/:/g, '');
+  const hatchId = `hatch${uid}`;
+  const stoneId = `stone${uid}`;
   const points = outline(counter);
   const names = edgeNames(counter.kind);
   const n = points.length;
@@ -38,17 +46,9 @@ export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
   const pad = WALL + 14 * k;
 
   const isWallSide = (i: number) => counter.edges[(i + n) % n] !== 'finished';
-  const rounded = points.map((_, i) => counter.corners[i] === 'radius' && canRoundCorner(counter, points, i));
+  const { rounded, ends: cornerEnds } = roundedOutline(counter, RADIUS);
   const roundable = points.map((_, i) => canRoundCorner(counter, points, i));
-
-  // Where the outline enters (a) and leaves (b) each corner; the same point unless the corner is rounded.
-  const cornerEnds = points.map((p, i) => {
-    if (!rounded[i]) return { a: p, b: p };
-    const prev = points[(i - 1 + n) % n];
-    const next = points[(i + 1) % n];
-    const r = Math.min(RADIUS, edgeLength(points, (i - 1 + n) % n) / 2, edgeLength(points, i) / 2);
-    return { a: towards(p, prev, r), b: towards(p, next, r) };
-  });
+  const showHelp = useShowHelp();
 
   const outlinePath =
     `M ${xy(cornerEnds[0].a)} ` +
@@ -59,11 +59,13 @@ export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
     const edges = [...counter.edges];
     edges[i] = NEXT_EDGE[edges[i]];
     onChange({ ...counter, edges });
+    showHelp(edges[i]);
   };
   const toggleCorner = (i: number) => {
     const corners = [...counter.corners];
     corners[i] = corners[i] === 'radius' ? 'square' : 'radius';
     onChange({ ...counter, corners });
+    showHelp(corners[i] === 'radius' ? 'radiusCorner' : 'squareCorner');
   };
   const onKey = (action: () => void) => (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -83,6 +85,7 @@ export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
         <pattern id={hatchId} patternUnits="userSpaceOnUse" width={1.6 * k} height={1.6 * k} patternTransform="rotate(45)">
           <line x1="0" y1="0" x2="0" y2={1.6 * k} className="hatch-line" />
         </pattern>
+        {color && <StonePattern id={stoneId} color={color} />}
       </defs>
 
       {/* Walls behind wall and backsplash edges, joined at corners where two walls meet */}
@@ -99,10 +102,13 @@ export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
         return <polygon key={`wall${i}`} points={band.map(xy).join(' ')} fill={`url(#${hatchId})`} className="wall-band" />;
       })}
 
-      <path d={outlinePath} className="stone" />
+      <path d={outlinePath} className="stone" style={color && !invalid ? { fill: `url(#${stoneId})` } : undefined} />
 
       {plan?.seams.map((s, i) => (
-        <line key={`seam${i}`} x1={s.a.x} y1={s.a.y} x2={s.b.x} y2={s.b.y} className="seam" />
+        <g key={`seam${i}`} className="seam-group" onMouseEnter={() => showHelp('seam')} onClick={() => showHelp('seam')}>
+          <line x1={s.a.x} y1={s.a.y} x2={s.b.x} y2={s.b.y} className="seam-hit" />
+          <line x1={s.a.x} y1={s.a.y} x2={s.b.x} y2={s.b.y} className="seam" />
+        </g>
       ))}
       {plan && plan.pieces.length > 1 &&
         plan.pieces.map((p) => (
@@ -131,6 +137,8 @@ export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
             aria-label={`${names[i]}, ${formatInches(length)}, ${EDGE_LABEL[type]}. Activate to make it ${next}.`}
             onClick={() => setEdge(i)}
             onKeyDown={onKey(() => setEdge(i))}
+            onMouseEnter={() => showHelp(type)}
+            onFocus={() => showHelp(type)}
           >
             <title>{`${names[i]}: ${EDGE_LABEL[type]} (click for ${next})`}</title>
             <line x1={start.x} y1={start.y} x2={end.x} y2={end.y} className="edge-hit" />
@@ -153,6 +161,8 @@ export function CounterDrawing({ counter, onChange, invalid, plan }: Props) {
             aria-label={`Corner between ${names[(i - 1 + n) % n]} and ${names[i]}: ${rounded[i] ? 'radius' : 'square'}`}
             onClick={() => toggleCorner(i)}
             onKeyDown={onKey(() => toggleCorner(i))}
+            onMouseEnter={() => showHelp(rounded[i] ? 'radiusCorner' : 'squareCorner')}
+            onFocus={() => showHelp(rounded[i] ? 'radiusCorner' : 'squareCorner')}
           >
             <title>{rounded[i] ? 'Radius corner (click for square)' : 'Square corner (click to round)'}</title>
             <circle cx={p.x} cy={p.y} r={3.5 * k} className="corner-hit" />
@@ -170,11 +180,6 @@ function xy(p: Point) {
 
 function move(p: Point, dir: Point, distance: number): Point {
   return { x: p.x + dir.x * distance, y: p.y + dir.y * distance };
-}
-
-function towards(from: Point, to: Point, distance: number): Point {
-  const len = Math.hypot(to.x - from.x, to.y - from.y) || 1;
-  return move(from, { x: (to.x - from.x) / len, y: (to.y - from.y) / len }, distance);
 }
 
 /** Rotates a label to run along its edge, never upside down; vertical labels read bottom to top, as on drawings. */

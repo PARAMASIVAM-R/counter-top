@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
-import { type Counter, legNames, type Measurements, type ShapeKind } from '../counter/shapes';
+import { type Counter, legNames, type ShapeKind } from '../counter/shapes';
 import { formatFeetInches, formatTypedInches, parseInches } from '../counter/units';
+import { Term, useShowHelp } from '../help/Help';
 
 const SHAPES: { kind: ShapeKind; label: string; icon: string }[] = [
   { kind: 'straight', label: 'Straight', icon: 'M2 6 H22 V12 H2 Z' },
@@ -41,9 +42,9 @@ export function LegInputs({ counter, onChange }: { counter: Counter; onChange: (
     <div className="legs">
       {counter.legs.map((leg, i) => (
         <fieldset key={`${counter.kind}-${i}`} className="leg">
-          <legend>{names[i]}</legend>
-          <DimensionInput label="Length" value={leg.length} onChange={(v) => setLeg(i, 'length', v)} />
-          <DimensionInput label="Depth" value={leg.depth} onChange={(v) => setLeg(i, 'depth', v)} />
+          <legend><Term id="run">{names[i]}</Term></legend>
+          <DimensionInput label="Length" help="length" value={leg.length} onChange={(v) => setLeg(i, 'length', v)} />
+          <DimensionInput label="Depth" help="depth" value={leg.depth} onChange={(v) => setLeg(i, 'depth', v)} />
         </fieldset>
       ))}
       <p className="hint">Inches, or feet and inches: 120, 25 1/2, 10' 6". Lengths run along the wall, into the corner.</p>
@@ -52,8 +53,9 @@ export function LegInputs({ counter, onChange }: { counter: Counter; onChange: (
 }
 
 /** Text input for a size. Accepts the ways people write sizes and updates the drawing as soon as it can read one. */
-function DimensionInput({ label, value, onChange }: { label: string; value: number; onChange: (inches: number) => void }) {
+function DimensionInput({ label, help, value, onChange }: { label: string; help: string; value: number; onChange: (inches: number) => void }) {
   const id = useId();
+  const showHelp = useShowHelp();
   const [text, setText] = useState(formatTypedInches(value));
   const [focused, setFocused] = useState(false);
   const parsed = parseInches(text);
@@ -66,7 +68,7 @@ function DimensionInput({ label, value, onChange }: { label: string; value: numb
 
   return (
     <div className="dimension-input">
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}><Term id={help}>{label}</Term></label>
       <input
         id={id}
         inputMode="decimal"
@@ -76,6 +78,7 @@ function DimensionInput({ label, value, onChange }: { label: string; value: numb
         aria-describedby={`${id}-hint`}
         onFocus={(e) => {
           setFocused(true);
+          showHelp(help);
           e.target.select();
         }}
         onBlur={() => setFocused(false)}
@@ -95,23 +98,12 @@ function DimensionInput({ label, value, onChange }: { label: string; value: numb
 export function EdgeLegend() {
   return (
     <ul className="legend">
-      <li><span className="swatch swatch-finished" />Finished edge</li>
-      <li><span className="swatch swatch-wall" />Against wall</li>
-      <li><span className="swatch swatch-backsplash" />Backsplash</li>
-      <li><span className="swatch swatch-corner" />Square corner</li>
-      <li><span className="swatch swatch-corner swatch-radius" />Radius corner</li>
-      <li><span className="swatch swatch-seam" />Seam</li>
+      <li><span className="swatch swatch-finished" /><Term id="finished">Finished edge</Term></li>
+      <li><span className="swatch swatch-wall" /><Term id="wall">Against wall</Term></li>
+      <li><span className="swatch swatch-backsplash" /><Term id="backsplash">Backsplash</Term></li>
+      <li><span className="swatch swatch-corner" /><Term id="squareCorner">Square corner</Term></li>
+      <li><span className="swatch swatch-corner swatch-radius" /><Term id="radiusCorner">Radius corner</Term></li>
+      <li><span className="swatch swatch-seam" /><Term id="seam">Seam</Term></li>
     </ul>
-  );
-}
-
-export function MeasurementList({ m }: { m: Measurements }) {
-  return (
-    <dl className="measurements">
-      <div><dt>Area</dt><dd>{m.areaSqFt.toFixed(2)} sq ft</dd></div>
-      <div><dt>Finished edge</dt><dd>{m.finishedEdgeFt.toFixed(2)} lin ft</dd></div>
-      <div><dt>Backsplash</dt><dd>{m.backsplashFt.toFixed(2)} lin ft</dd></div>
-      <div><dt>Radius corners</dt><dd>{m.radiusCorners}</dd></div>
-    </dl>
   );
 }

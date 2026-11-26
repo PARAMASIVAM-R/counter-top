@@ -3,7 +3,9 @@ import { type Counter, measure, round2, validateCounter } from './shapes';
 
 export interface QuoteOptions {
   materialId: string;
-  /** 1-based, matching how shops talk about levels. */
+  /** The stone picked. Optional because quotes saved before colours existed don't have one. */
+  colorId?: string;
+  /** 1-based, matching how shops talk about levels. Set from the colour when one is picked. */
   level: number;
   edgeProfileId: string;
   cutouts: Partial<Record<CutoutId, number>>;
@@ -17,6 +19,8 @@ export interface QuoteLine {
   unit: Unit;
   unitPrice: number;
   amount: number;
+  /** Glossary entry that explains this line in plain words. */
+  term: string;
 }
 
 export interface Quote {
@@ -48,29 +52,31 @@ export function quote(counter: Counter, options: QuoteOptions, prices: PriceList
   }
 
   const { areaSqFt, finishedEdgeFt, backsplashFt, radiusCorners } = measure(counter);
+  const color = material.colors.find((c) => c.id === options.colorId);
+  const stone = color ? `${color.name} ${material.name.toLowerCase()}` : material.name;
 
   const lines: QuoteLine[] = [
-    line(`${material.name}, level ${options.level}`, areaSqFt, 'sq ft', materialPrice),
-    line(`${edgeProfile.name} edge`, finishedEdgeFt, 'lin ft', edgeProfile.pricePerLinearFoot),
+    line(`${stone}, level ${options.level}`, areaSqFt, 'sq ft', materialPrice, material.id),
+    line(`${edgeProfile.name} edge`, finishedEdgeFt, 'lin ft', edgeProfile.pricePerLinearFoot, edgeProfile.id),
   ];
   for (const cutout of prices.cutouts) {
     const count = options.cutouts[cutout.id] ?? 0;
-    if (count > 0) lines.push(line(cutout.name, count, 'each', cutout.price));
+    if (count > 0) lines.push(line(cutout.name, count, 'each', cutout.price, cutout.id));
   }
-  if (radiusCorners > 0) lines.push(line('Radius corner', radiusCorners, 'each', prices.radiusCornerEach));
-  if (backsplashFt > 0) lines.push(line('Backsplash', backsplashFt, 'lin ft', prices.backsplashPerLinearFoot));
+  if (radiusCorners > 0) lines.push(line('Radius corner', radiusCorners, 'each', prices.radiusCornerEach, 'radiusCorner'));
+  if (backsplashFt > 0) lines.push(line('Backsplash', backsplashFt, 'lin ft', prices.backsplashPerLinearFoot, 'backsplash'));
 
   const subtotal = round2(lines.reduce((sum, l) => sum + l.amount, 0));
   const minimumApplied = subtotal < prices.minimumJob;
   if (minimumApplied) {
     const topUp = round2(prices.minimumJob - subtotal);
-    lines.push({ label: 'Minimum job charge', quantity: 1, unit: 'each', unitPrice: topUp, amount: topUp });
+    lines.push({ label: 'Minimum job charge', quantity: 1, unit: 'each', unitPrice: topUp, amount: topUp, term: 'minimumJob' });
   }
   const total = minimumApplied ? prices.minimumJob : subtotal;
 
   return { lines, areaSqFt, finishedEdgeFt, backsplashFt, subtotal, minimumApplied, total, errors: [] };
 }
 
-function line(label: string, quantity: number, unit: Unit, unitPrice: number): QuoteLine {
-  return { label, quantity, unit, unitPrice, amount: round2(quantity * unitPrice) };
+function line(label: string, quantity: number, unit: Unit, unitPrice: number, term: string): QuoteLine {
+  return { label, quantity, unit, unitPrice, amount: round2(quantity * unitPrice), term };
 }
